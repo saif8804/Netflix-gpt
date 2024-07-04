@@ -6,6 +6,12 @@
  - SignIn / SignUp
  - validation
  - useRef Hook
+ - create signup user account
+ - implement signin user api
+ - created redux store with userSlice
+ - implemented signout
+ - update profile
+ - feth from TMBD
 
 
  # Features 

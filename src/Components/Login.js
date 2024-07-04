@@ -1,12 +1,15 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidData } from "../Utils/validate";
-import {createUserWithEmailAndPassword } from "firebase/auth";
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword,updateProfile } from "firebase/auth";
 import { auth } from "../Utils/firebase";
+import { useDispatch } from "react-redux";
+import { addUser } from "../Utils/userSlice";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
 
   const name = useRef(null)
   const email = useRef(null);
@@ -27,6 +30,27 @@ const Login = () => {
           .then((userCredential) => {
             // Signed up userCredential
             const user = userCredential.user;
+            updateProfile(user, {
+              displayName: name.current.value, photoURL: 
+              "https://avatars.githubusercontent.com/u/113436394?s=400&u=5f81c4ab16917d39e2f28359370ba098d40db08c&v=4"
+
+            }).then(() => {
+           const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+              addUser({
+               uid: uid,
+               email: email,
+               displayName: displayName,
+               photoURL: photoURL,
+          })
+        );
+              // ...
+            }).catch((error) => {
+              // An error occurred
+
+              setErrorMessage(error.message);
+              // ...
+            });
             console.log(user);
             // ...
           })
@@ -37,6 +61,18 @@ const Login = () => {
             // ..
           });
          }else{
+
+          signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+          .then((userCredential) => {
+             // Signed in 
+              const user = userCredential.user;
+              console.log(user);
+          })
+             .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              setErrorMessage(errorCode + - + errorMessage);
+    });
                 
          }
   };
@@ -44,7 +80,11 @@ const Login = () => {
     <div>
       <Header />
       <div className="absolute">
-        <img src="https://assets.nflxext.com/ffe/siteui/vlv3/335ddde7-3955-499c-b4cc-ca2eb7e1ae71/a7d20bc1-831c-4f9d-8153-11bdf7a08d23/IN-en-20240624-POP_SIGNUP_TWO_WEEKS-perspective_WEB_13cda806-d858-493e-b4aa-f2792ff965dc_medium.jpg" />
+        <img 
+        alt="logo-Netflix"       
+        src="https://assets.nflxext.com/ffe/siteui/vlv3/335ddde7-3955-499c-b4cc-ca2eb7e1ae71/a7d20bc1-831c-4f9d-8153-11bdf7a08d23/IN-en-20240624-POP_SIGNUP_TWO_WEEKS-perspective_WEB_13cda806-d858-493e-b4aa-f2792ff965dc_medium.jpg" 
+        />
+        
       </div>
       <form
         onSubmit={(e) => {
